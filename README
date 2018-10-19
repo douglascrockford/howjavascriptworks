@@ -1,0 +1,22 @@
+Companion to How JavaScript Works.
+
+Douglas Crockford
+
+Public Domain
+
+This set contains programs from the book:
+
+    big_integer.js
+    big_float.js
+    big_rational.js
+
+    neo.tokenize.js
+    neo.parse.js
+    neo.codegen.js
+    neo.runtime.js
+
+    include.js
+
+Also see ecomcon, fulfill, JSCheck, and parseq.
+
+The book is on sale now. http://www.howjavascriptworks.com
