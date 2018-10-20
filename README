@@ -6,6 +6,8 @@ Public Domain
 
 This set contains programs from the book:
 
+    deconstruct.js
+
     big_integer.js
     big_float.js
     big_rational.js
