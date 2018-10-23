@@ -1,23 +1,24 @@
 // neo.codegen.js
 // Douglas Crockford
-// 2018-10-09
+// 2018-10-22
 
 /*property
     abs, alphameric, array, break, call, char, code, create, def, export, fail,
-    false, forEach, fraction, freeze, id, if, import, integer, isArray, join,
-    length, let, loop, map, neg, not, null, number, origin, push, record,
-    repeat, replace, return, stone, string, stringify, text, true, twoth, var,
-    wunth, zeroth
+    false, forEach, fraction, id, if, import, integer, isArray, join, length,
+    let, loop, map, neg, not, null, number, origin, push, record, repeat,
+    replace, return, startsWith, stone, string, stringify, text, true, twoth,
+    var, wunth, zeroth
 */
 
 import big_float from "./big_float.js";
+import $NEO from "./neo.runtime.js";
 
 function make_set(array, value = true) {
     const object = Object.create(null);
     array.forEach(function (element) {
         object[element] = value;
     });
-    return Object.freeze(object);
+    return $NEO.stone(object);
 }
 
 const boolean_operator = make_set([
@@ -35,7 +36,7 @@ const reserved = make_set([
     "undefined", "var", "void", "while", "with", "yield"
 ]);
 
-const primordial = Object.freeze({
+const primordial = $NEO.stone({
     "abs": "$NEO.abs",
     "array": "$NEO.array",
     "array?": "Array.isArray",
@@ -61,7 +62,7 @@ const primordial = Object.freeze({
     "number?": "$NEO.is_big_float",
     "record": "$NEO.record",
     "record?": "$NEO.record_",
-    "stone": "Object.freeze",
+    "stone": "$NEO.stone",
     "stone?": "Object.isFrozen",
     "text": "$NEO.text",
     "text?": "$NEO.text_",
@@ -228,7 +229,7 @@ function block(array) {
     return "{" + string + begin() + "}";
 }
 
-statement_transform = Object.freeze({
+statement_transform = $NEO.stone({
     break: function (ignore) {
         return "break;";
     },
@@ -242,7 +243,12 @@ statement_transform = Object.freeze({
         );
     },
     export: function (thing) {
-        return "export default " + expression(thing.zeroth) + ";";
+        const exportation = expression(thing.zeroth);
+        return "export default " + (
+            exportation.startsWith("$NEO.stone(")
+            ? exportation
+            : "$NEO.stone(" + exportation + ")"
+        ) + ";";
     },
     fail: function () {
         return "throw $NEO.fail(\"fail\");";
@@ -310,7 +316,7 @@ statement_transform = Object.freeze({
     }
 });
 
-const functino = Object.freeze({
+const functino = $NEO.stone({
     "?": "$NEO.ternary",
     "|": "$NEO.default",
     "/\\": "$NEO.and",
@@ -333,7 +339,7 @@ const functino = Object.freeze({
     "(": "$NEO.resolve"
 });
 
-operator_transform = Object.freeze({
+operator_transform = $NEO.stone({
     "?": function (thing) {
         indent();
         let padding = begin();
@@ -414,7 +420,7 @@ operator_transform = Object.freeze({
         if (typeof thing.zeroth === "string") {
             return functino[thing.zeroth];
         }
-        return "Object.freeze(function (" + thing.zeroth.map(function (param) {
+        return "$NEO.stone(function (" + thing.zeroth.map(function (param) {
             if (param.id === "...") {
                 return "..." + mangle(param.zeroth.id);
             }
@@ -432,7 +438,7 @@ operator_transform = Object.freeze({
     }
 });
 
-export default function codegen(tree) {
+export default $NEO.stone(function codegen(tree) {
     front_matter = [
         "import $NEO from \"./neo.runtime.js\"\n"
     ];
@@ -440,5 +446,5 @@ export default function codegen(tree) {
     unique = Object.create(null);
     const bulk = statements(tree.zeroth);
     return front_matter.join("") + bulk;
-};
+});
 
