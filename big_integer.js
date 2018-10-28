@@ -1,6 +1,6 @@
 // big_integer.js
 // Douglas Crockford
-// 2018-09-24
+// 2018-10-28
 
 // You can access the big integer object in your module by importing it.
 //      import big_integer from "./big_integer.js";
@@ -65,8 +65,6 @@ function mint(proto_big_integer) {
         if (proto_big_integer[least] === 1) {
             return negative_wun;
         }
-    } else {
-        return undefined;
     }
     return Object.freeze(proto_big_integer);
 }
