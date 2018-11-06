@@ -1,6 +1,6 @@
 // big_rational.js
 // Douglas Crockford
-// 2018-09-24
+// 2018-11-05
 
 // You can access the big rational object in your module by importing it.
 //      import big_rational from "./big_rational.js";
@@ -107,8 +107,9 @@ function deconstruct(number) {
             reduction /= 2;
         }
 
-// Reduce the exponent: When the exponent is 0, the number can be viewed as an
-// integer. If the exponent is not 0, then adjust to correct the coefficient.
+// Reduce the exponent: When the exponent is zero, the number can be viewed
+// as an integer. If the exponent is not zero, then adjust to correct the
+// coefficient.
 
         reduction = exponent;
         while (reduction > 0) {
@@ -390,7 +391,7 @@ function string(a, nr_places) {
 // then round up.
 
         remains = big_integer.abs(remains);
-        if (nr_places === undefined) {
+        if (nr_places !== undefined) {
             let [fractus, residue] = big_integer.divrem(
                 big_integer.mul(
                     remains,
