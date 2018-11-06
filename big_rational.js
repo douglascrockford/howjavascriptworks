@@ -390,7 +390,7 @@ function string(a, nr_places) {
 // then round up.
 
         remains = big_integer.abs(remains);
-        if (nr_places === undefined) {
+        if (nr_places !== undefined) {
             let [fractus, residue] = big_integer.divrem(
                 big_integer.mul(
                     remains,
