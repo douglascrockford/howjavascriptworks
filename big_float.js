@@ -1,10 +1,19 @@
 // big_float.js
 // Douglas Crockford
-// 2018-10-09
+// 2018-11-18
 
 // You can access the big decimal floating point object in your module
 // by importing it.
+
 //      import big_float from "./big_float.js";
+
+//      big_float.eq(
+//          big_float.add(
+//              big_float.make("0.1"),
+//              big_float.make("0.2")
+//          ),
+//          big_float.make("0.3")
+//      )                           // true
 
 /*jslint bitwise */
 
@@ -318,8 +327,9 @@ function deconstruct(number) {
             reduction /= 2;
         }
 
-// Reduce the exponent: When the exponent is 0, the number can be viewed as an
-// integer. If the exponent is not 0, then adjust to correct the coefficient.
+// Reduce the exponent: When the exponent is zero, the number can be viewed
+// as an integer. If the exponent is not zero, then adjust to correct the
+// coefficient.
 
         reduction = exponent;
         while (reduction > 0) {
