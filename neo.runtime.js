@@ -591,6 +591,7 @@ export default stone({
     max,
     min,
     mul,
+    eq,
     ne,
     neg,
     not,
