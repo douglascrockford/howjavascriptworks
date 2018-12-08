@@ -578,6 +578,7 @@ export default stone({
     code,
     default: default_function,
     div,
+    eq,
     fail,
     fraction,
     function_,
