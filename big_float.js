@@ -103,7 +103,7 @@ function conform_op(op) {
             differential === 0
             ? make_big_float(op(a.coefficient, b.coefficient), a.exponent)
             : (
-                differential < 0
+                differential > 0
                 ? make_big_float(
                     op(
                         big_integer.mul(
