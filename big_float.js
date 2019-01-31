@@ -98,7 +98,7 @@ function abs(a) {
 
 function conform_op(op) {
     return function (a, b) {
-        const differential = a.exponent - b.exponent;
+        const differential = b.exponent - a.exponent;
         return (
             differential === 0
             ? make_big_float(op(a.coefficient, b.coefficient), a.exponent)
