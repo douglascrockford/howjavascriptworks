@@ -1,6 +1,6 @@
 // big_float.js
 // Douglas Crockford
-// 2018-11-18
+// 2019-01-31
 
 // You can access the big decimal floating point object in your module
 // by importing it.
@@ -108,7 +108,7 @@ function conform_op(op) {
                     op(
                         big_integer.mul(
                             a.coefficient,
-                            big_integer.power(big_integer.ten, -differential)
+                            big_integer.power(big_integer.ten, differential)
                         ),
                         b.coefficient
                     ),
@@ -119,7 +119,7 @@ function conform_op(op) {
                         a.coefficient,
                         big_integer.mul(
                             b.coefficient,
-                            big_integer.power(big_integer.ten, differential)
+                            big_integer.power(big_integer.ten, -differential)
                         )
                     ),
                     a.exponent
