@@ -1,6 +1,6 @@
 // big_integer.js
 // Douglas Crockford
-// 2018-10-28
+// 2019-02-09
 
 // You can access the big integer object in your module by importing it.
 //      import big_integer from "./big_integer.js";
@@ -546,7 +546,7 @@ function divrem(dividend, divisor) {
 // left until its most significant bit is '1'. We also shift the dividend by
 // the same amount. See Algorithm 4.3.1D in 'The Art of Computer Programming'.
 
-// To determine the shift count, we find the number of leading '0'.
+// To determine the shift count, we find the number of leading zero bits.
 // The 'clz32' function counts in a field of 32 bits, but we are only
 // concerned with a field of 24 bits, so we subtract 8.
 
