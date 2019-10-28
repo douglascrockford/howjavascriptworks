@@ -147,6 +147,9 @@ function array(zeroth, wunth, ...rest) {
         );
     }
     if (Array.isArray(zeroth)) {
+        if (typeof wunth === "function") {
+            return zeroth.map(wunth);
+        }
         return zeroth.slice(big_float.number(wunth), big_float.number(rest[0]));
     }
     if (typeof zeroth === "object") {
