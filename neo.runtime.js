@@ -1,6 +1,6 @@
 // neo.runtime.js
 // Douglas Crockford
-// 2018-10-22
+// 2019-11-07
 
 /*property
     abs, add, and, array, assert_boolean, assign, bitand, bitdown, bitmask,
@@ -147,6 +147,9 @@ function array(zeroth, wunth, ...rest) {
         );
     }
     if (Array.isArray(zeroth)) {
+        if (typeof wunth === "function") {
+            return zeroth.map(wunth);
+        }
         return zeroth.slice(big_float.number(wunth), big_float.number(rest[0]));
     }
     if (typeof zeroth === "object") {
