@@ -225,7 +225,10 @@ function record(zeroth, wunth) {
 
 function text(zeroth, wunth, twoth) {
     if (typeof zeroth === "string") {
-        return (zeroth.slice(big_float.number(wunth), big_float.number(twoth)));
+        return zeroth.slice(
+            big_float.is_big_float(wunth) ? big_float.number(wunth) : undefined,
+            big_float.is_big_float(twoth) ? big_float.number(twoth) : undefined
+        );
     }
     if (big_float.is_big_float(zeroth)) {
         return big_float.string(zeroth, wunth);
