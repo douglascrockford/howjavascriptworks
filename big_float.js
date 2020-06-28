@@ -1,6 +1,6 @@
 // big_float.js
 // Douglas Crockford
-// 2019-01-31
+// 2019-06-28
 
 // You can access the big decimal floating point object in your module
 // by importing it.
@@ -65,7 +65,7 @@ function make_big_float(coefficient, exponent) {
 const big_integer_ten_million = big_integer.make(10000000);
 
 function number(a) {
-    return (
+    const result = (
         is_big_float(a)
         ? (
             a.exponent === 0
@@ -81,6 +81,11 @@ function number(a) {
                 : Number(a)
             )
         )
+    );
+    return (
+        Number.isFinite(result)
+        ? result
+        : undefined
     );
 }
 
@@ -294,7 +299,7 @@ function deconstruct(number) {
 // This function deconstructs a number, reducing it to its components:
 // a sign, an integer coefficient, and an exponent, such that
 
-//  '      number = sign * coefficient * (2 ** exponent)'
+//            number = sign * coefficient * (2 ** exponent)
 
     let sign = 1;
     let coefficient = number;
