@@ -430,11 +430,24 @@ operator_transform = $NEO.stone({
                 );
             }
             return mangle(param.id);
-        }).join(", ") + ") " + (
-            Array.isArray(thing.wunth)
-            ? block(thing.wunth)
-            : "{return " + expression(thing.wunth) + ";}"
-        ) + ")";
+        }).join(", ") + ") " + (function () {
+            if (Array.isArray(thing.wunth)) {
+                if (thing.twoth !== undefined) {
+                    let padding = begin();
+                    let body;
+                    indent();
+                    body = (
+                        "{" + begin() + "try " + block(thing.wunth)
+                        + " catch (ignore) " + block(thing.twoth)
+                        + padding + "}"
+                    );
+                    outdent();
+                    return body;
+                }
+                return block(thing.wunth);
+            }
+            return "{return " + expression(thing.wunth) + ";}";
+        }()) + ")";
     }
 });
 
