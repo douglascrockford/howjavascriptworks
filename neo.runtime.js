@@ -207,9 +207,6 @@ function record(zeroth, wunth) {
         if (wunth === undefined) {
             return Object.assign(newness, zeroth);
         }
-        if (typeof wunth === "object") {
-            return Object.assign(newness, zeroth, wunth);
-        }
         if (Array.isArray(wunth)) {
             wunth.forEach(function (key) {
                 let value = zeroth[key];
@@ -219,13 +216,16 @@ function record(zeroth, wunth) {
             });
             return newness;
         }
+        if (typeof wunth === "object") {
+            return Object.assign(newness, zeroth, wunth);
+        }
     }
     return fail("record");
 }
 
 function text(zeroth, wunth, twoth) {
     if (typeof zeroth === "string") {
-        return (zeroth.slice(big_float.number(wunth), big_float.number(twoth)));
+        return zeroth.slice(big_float.number(wunth), big_float.number(twoth));
     }
     if (big_float.is_big_float(zeroth)) {
         return big_float.string(zeroth, wunth);
