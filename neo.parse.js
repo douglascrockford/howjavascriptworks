@@ -1,6 +1,6 @@
 // neo.parse.js
 // Douglas Crockford
-// 2018-08-27
+// 2022-07-29
 
 // Public Domain
 
@@ -625,7 +625,7 @@ const functino = (function make_set(array, value = true) {
     return Object.freeze(object);
 }([
     "?", "|", "/\\", "\\/", "=", "≠", "<", "≥", ">", "≤",
-    "~", "≈", "+", "-", ">>", "<<", "*", "/", "[", "("
+    "~", "≈", "+", "-", ">>", "<<", "*", "/", "[]", "("
 ]));
 
 prefix("ƒ", function function_literal(the_function) {
@@ -642,9 +642,6 @@ prefix("ƒ", function function_literal(the_function) {
         if (the_operator.id === "(") {
             same_line();
             advance(")");
-        } else if (the_operator.id === "[") {
-            same_line();
-            advance("]");
         } else if (the_operator.id === "?") {
             same_line();
             advance("!");

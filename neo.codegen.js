@@ -1,6 +1,6 @@
 // neo.codegen.js
 // Douglas Crockford
-// 2018-10-22
+// 2022-07-29
 
 /*property
     abs, alphameric, array, break, call, char, code, create, def, export, fail,
@@ -335,7 +335,7 @@ const functino = $NEO.stone({
     "<<": "$NEO.min",
     "*": "$NEO.mul",
     "/": "$NEO.div",
-    "[": "$NEO.get",
+    "[]": "$NEO.get",
     "(": "$NEO.resolve"
 });
 
