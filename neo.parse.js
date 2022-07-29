@@ -841,7 +841,7 @@ parse_statement.let = function (the_let) {
     }
     let readonly = left.readonly;
 
-// Now we consider the suffix operators ' []  .  [ ' and ' {'.
+// Now we consider the suffix operators ' []  .  [ ' and ' ('.
 
     while (true) {
         if (token === the_end) {
