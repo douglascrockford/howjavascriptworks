@@ -1,6 +1,6 @@
 // neo.parse.js
 // Douglas Crockford
-// 2018-08-27
+// 2022-07-29
 
 // Public Domain
 
@@ -625,7 +625,7 @@ const functino = (function make_set(array, value = true) {
     return Object.freeze(object);
 }([
     "?", "|", "/\\", "\\/", "=", "≠", "<", "≥", ">", "≤",
-    "~", "≈", "+", "-", ">>", "<<", "*", "/", "[", "("
+    "~", "≈", "+", "-", ">>", "<<", "*", "/", "[]", "("
 ]));
 
 prefix("ƒ", function function_literal(the_function) {
@@ -642,9 +642,6 @@ prefix("ƒ", function function_literal(the_function) {
         if (the_operator.id === "(") {
             same_line();
             advance(")");
-        } else if (the_operator.id === "[") {
-            same_line();
-            advance("]");
         } else if (the_operator.id === "?") {
             same_line();
             advance("!");
@@ -844,7 +841,7 @@ parse_statement.let = function (the_let) {
     }
     let readonly = left.readonly;
 
-// Now we consider the suffix operators ' []  .  [ ' and ' {'.
+// Now we consider the suffix operators ' []  .  [ ' and ' ('.
 
     while (true) {
         if (token === the_end) {
@@ -921,28 +918,21 @@ parse_statement.loop = function (the_loop) {
 };
 
 parse_statement.return = function (the_return) {
-    try {
-        if (now_function.parent === undefined) {
-            return error(the_return, "'return' wants to be in a function.");
-        }
-        loop.forEach(function (element, element_nr) {
-            if (element === "infinite") {
-                loop[element_nr] = "return";
-            }
-        });
-        if (is_line_break()) {
-            return error(the_return, "'return' wants a return value.");
-        }
-        the_return.zeroth = expression();
-        if (token === "}") {
-            return error(the_return, "Misplaced 'return'.");
-        }
-        the_return.disrupt = true;
-        the_return.return = true;
-        return the_return;
-    } catch (ignore) {
-        return the_error;
+    if (now_function.parent === undefined) {
+        return error(the_return, "'return' wants to be in a function.");
     }
+    loop.forEach(function (element, element_nr) {
+        if (element === "infinite") {
+            loop[element_nr] = "return";
+        }
+    });
+    if (is_line_break()) {
+        return error(the_return, "'return' wants a return value.");
+    }
+    the_return.zeroth = expression();
+    the_return.disrupt = true;
+    the_return.return = true;
+    return the_return;
 };
 
 parse_statement.var = function (the_var) {
