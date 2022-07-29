@@ -918,28 +918,21 @@ parse_statement.loop = function (the_loop) {
 };
 
 parse_statement.return = function (the_return) {
-    try {
-        if (now_function.parent === undefined) {
-            return error(the_return, "'return' wants to be in a function.");
-        }
-        loop.forEach(function (element, element_nr) {
-            if (element === "infinite") {
-                loop[element_nr] = "return";
-            }
-        });
-        if (is_line_break()) {
-            return error(the_return, "'return' wants a return value.");
-        }
-        the_return.zeroth = expression();
-        if (token === "}") {
-            return error(the_return, "Misplaced 'return'.");
-        }
-        the_return.disrupt = true;
-        the_return.return = true;
-        return the_return;
-    } catch (ignore) {
-        return the_error;
+    if (now_function.parent === undefined) {
+        return error(the_return, "'return' wants to be in a function.");
     }
+    loop.forEach(function (element, element_nr) {
+        if (element === "infinite") {
+            loop[element_nr] = "return";
+        }
+    });
+    if (is_line_break()) {
+        return error(the_return, "'return' wants a return value.");
+    }
+    the_return.zeroth = expression();
+    the_return.disrupt = true;
+    the_return.return = true;
+    return the_return;
 };
 
 parse_statement.var = function (the_var) {
