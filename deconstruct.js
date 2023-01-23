@@ -50,10 +50,10 @@ function deconstruct(number) {
             reduction += 1;
         }
 
-// The number's coefficient may lie outside the safe integer range.
-// If so, make it safe.
+// The number's coefficient may lie outside the safe integer range, so we shift
+// as much information as we can into the exponent.
 
-        while (!Number.isSafeInteger(coefficient)) {
+        while (coefficient % 2 === 0) {
             coefficient /= 2;
             exponent += 1;
         }
