@@ -1,6 +1,6 @@
 // neo.runtime.js
 // Douglas Crockford
-// 2019-11-07
+// 2022-07-29
 
 /*property
     abs, add, and, array, assert_boolean, assign, bitand, bitdown, bitmask,
@@ -125,7 +125,7 @@ function set(container, key, value) {
     }
 }
 
-function array(zeroth, wunth, ...rest) {
+function array(zeroth, wunth, twoth) {
 
 // The 'array' function does the work of 'new Array', array'.fill',
 // array'.slice', 'Object.keys', string'.split', and more.
@@ -141,7 +141,7 @@ function array(zeroth, wunth, ...rest) {
             ? newness
             : (
                 typeof wunth === "function"
-                ? newness.map(wunth)
+                ? newness.fill().map(wunth)
                 : newness.fill(wunth)
             )
         );
@@ -150,7 +150,7 @@ function array(zeroth, wunth, ...rest) {
         if (typeof wunth === "function") {
             return zeroth.map(wunth);
         }
-        return zeroth.slice(big_float.number(wunth), big_float.number(rest[0]));
+        return zeroth.slice(big_float.number(wunth), big_float.number(twoth));
     }
     if (typeof zeroth === "object") {
         return Object.keys(zeroth);
@@ -207,9 +207,6 @@ function record(zeroth, wunth) {
         if (wunth === undefined) {
             return Object.assign(newness, zeroth);
         }
-        if (typeof wunth === "object") {
-            return Object.assign(newness, zeroth, wunth);
-        }
         if (Array.isArray(wunth)) {
             wunth.forEach(function (key) {
                 let value = zeroth[key];
@@ -219,13 +216,16 @@ function record(zeroth, wunth) {
             });
             return newness;
         }
+        if (typeof wunth === "object") {
+            return Object.assign(newness, zeroth, wunth);
+        }
     }
     return fail("record");
 }
 
 function text(zeroth, wunth, twoth) {
     if (typeof zeroth === "string") {
-        return (zeroth.slice(big_float.number(wunth), big_float.number(twoth)));
+        return zeroth.slice(big_float.number(wunth), big_float.number(twoth));
     }
     if (big_float.is_big_float(zeroth)) {
         return big_float.string(zeroth, wunth);
