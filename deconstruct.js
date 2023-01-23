@@ -3,7 +3,7 @@ function deconstruct(number) {
 // This function deconstructs a number, reducing it to its components:
 // a sign, an integer coefficient, and an exponent, such that
 
-//  '      number = sign * coefficient * (2 ** exponent)'
+//            number = sign * coefficient * (2 ** exponent)
 
     let sign = 1;
     let coefficient = number;
@@ -48,6 +48,14 @@ function deconstruct(number) {
         while (reduction < 0) {
             coefficient *= 2;
             reduction += 1;
+        }
+
+// The number's coefficient may lie outside the safe integer range, so we shift
+// as much information as we can into the exponent.
+
+        while (coefficient % 2 === 0) {
+            coefficient /= 2;
+            exponent += 1;
         }
     }
 
