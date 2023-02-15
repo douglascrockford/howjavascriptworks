@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta
+    http-equiv="Access-Control-Allow-Origin"
+    content="*"
+>
+<meta
+    http-equiv="Content-Security-Policy"
+    content="font-src 'self'; script-src 'self' 'unsafe-inline'"
+>
+<title>test_bi</title>
+</head>
+<body>
+<p>Test big_integer</p>
+<pre id=output>Watch this space.</pre>
+
+<script type=module>
+
+import big_integer from "./big_integer.js";
+import JSCheck from "./jscheck.js";
+const jsc = JSCheck();
+
+function bigint(max_nr_bits) {
+    let nr_bits = Math.floor(Math.random() * max_nr_bits);
+    return function () {
+        let result = big_integer.random(nr_bits);
+        return (
+            Math.random() < 0.5
+            ? big_integer.neg(result)
+            : result
+        );
+    }
+}
+
+jsc.claim(
+    "shift & significant_bits",
+    function (verdict, n) {
+        return verdict(big_integer.eq(
+            big_integer.significant_bits(big_integer.shift_up(big_integer.wun, big_integer.sub(n, big_integer.wun))),
+            n
+        ));
+    },
+    [bigint(10)],
+    function classifier(a) {
+        if (big_integer.is_negative(a)) {
+            return undefined;
+        }
+        return "";
+    }
+);
+
+jsc.claim(
+    "mask & significant_bits",
+    function (verdict, n) {
+        let m = big_integer.mask(n);
+        let s = big_integer.significant_bits(m);
+        if (big_integer.eq(n, s)) {
+            return verdict(true);
+        }
+        console.log(big_integer.string(n) + " " + big_integer.string(s));
+        debugger;
+        return verdict(false);
+    },
+    [bigint(10)],
+    function classifier(a) {
+        if (big_integer.is_negative(a)) {
+            return undefined;
+        }
+        return "";
+    }
+);
+
+jsc.claim("mask & shift_up", function (verdict, n) {
+    return verdict(big_integer.eq(
+        big_integer.sub(big_integer.shift_up(big_integer.wun, n), big_integer.wun),
+        big_integer.mask(n)
+    ));
+}, [jsc.integer(0, 96)]);
+
+jsc.claim("demorgan", function (verdict, n) {
+
+//     !(a && b) === !a || !b
+
+    let a = big_integer.random(n);
+    let b = big_integer.random(n);
+    let mask = big_integer.mask(n);
+    let left = big_integer.xor(mask, big_integer.and(a, b));
+    let right = big_integer.or(big_integer.xor(mask, a), big_integer.xor(mask, b));
+    return verdict(big_integer.eq(left, right));
+}, [jsc.integer()]);
+
+jsc.claim("add & sub", function (verdict, a, b) {
+    let c = big_integer.add(a, b);
+    let aa = big_integer.sub(c, b);
+    let cc = big_integer.add(aa, b);
+    return verdict(big_integer.eq(c, cc));
+}, [bigint(100), bigint(100)]);
+
+jsc.claim("add & sub & neg", function (verdict, a, b) {
+    let c = big_integer.add(a, b);
+    let na = big_integer.sub(b, c);
+    let aa = big_integer.neg(na);
+    return verdict(big_integer.eq(a, aa));
+}, [bigint(24), bigint(24)]);
+
+jsc.claim("mul", function (verdict, a, b) {
+    let c = big_integer.mul(a, b);
+    let cc = big_integer.mul(b, a);
+    return verdict(big_integer.eq(c, cc));
+}, [bigint(100), bigint(100)]);
+
+jsc.claim("exp & mask", function (verdict, n) {
+    return verdict(big_integer.eq(
+        big_integer.add(big_integer.mask(n), big_integer.wun),
+        big_integer.power(big_integer.two, n)
+    ));
+}, [jsc.integer(100)]);
+
+jsc.claim("shift_up & shift_down", function (verdict, a, b) {
+    a = big_integer.abs(a);
+    b = big_integer.abs(b);
+    let c = big_integer.shift_up(a, b);
+    let aa = big_integer.shift_down(c, b);
+    return verdict(big_integer.eq(a, aa));
+}, [bigint(100), jsc.integer(100)]);
+
+jsc.claim("mul & div", function (verdict, a, b) {
+    let product = big_integer.mul(a, b);
+    let aa = big_integer.div(product, b);
+    return verdict(big_integer.eq(a, aa));
+}, [bigint(99), bigint(99)], function classifier(a, b) {
+    if (big_integer.is_zero(b)) {
+        return undefined;
+    }
+    return "";
+});
+
+jsc.claim("div & mul & remainder", function (verdict, a, b) {
+    let [quotient, remainder] = big_integer.divrem(a, b);
+    let aa = big_integer.add(big_integer.mul(quotient, b), remainder);
+    return verdict(big_integer.eq(a, aa));
+}, [bigint(99), bigint(99)], function classifier(a, b) {
+    if (big_integer.is_zero(b)) {
+        return undefined;
+    }
+    return a[0] + b[0];
+});
+
+jsc.claim("and & divrem", function (verdict, a, b) {
+    let c = big_integer.shift_up(big_integer.wun, b);
+    let cc = big_integer.sub(c, big_integer.wun);
+    let [d, r] = big_integer.divrem(a, c);
+    let m = big_integer.and(a, cc);
+    return verdict(big_integer.eq(r, m));
+}, [bigint(100), jsc.integer(100)], function classifier(a, b) {
+    if (!big_integer.is_negative(a)) {
+        return (
+            big_integer.is_zero(a)
+            ? "zero"
+            : "positive"
+        );
+    }
+});
+
+jsc.claim("shift_up & mul", function (verdict, a, b) {
+    a = big_integer.abs(a);
+    let c = big_integer.power(big_integer.two, b);
+    let p = big_integer.mul(a, c);
+    let l = big_integer.shift_up(a, b);
+    return verdict(big_integer.eq(p, l));
+}, [bigint(100), jsc.integer(100)], function classifier(a, b) {
+    if (!big_integer.is_negative(a)) {
+        return (
+            big_integer.is_zero(a)
+            ? "zero"
+            : "positive"
+        );
+    }
+});
+
+function gcd(a, b) {
+
+// Stein's Binary Greatest Common Divisor Algorithm
+
+// First make sure everything is greater than zero.
+
+    a = big_integer.abs(a);
+    b = big_integer.abs(b);
+    if (a === undefined || b === undefined) {
+        return undefined;
+    }
+    if (big_integer.is_zero(a)) {
+        return b;
+    }
+    if (big_integer.is_zero(b)) {
+        return a;
+    }
+
+// It is easy to find common factors of two by examining the least
+// significant bits. We examine both for evenness.
+// We count the number of zero bits that are removed. We know that
+// neither a nor b is zero, so each contains at least 1 wun bit.
+
+    let twos = 0;
+    let zero = big_integer.zero;
+    let wun = big_integer.wun;
+    let ord = big_integer.or(a, b);
+    while (big_integer.eq(
+        big_integer.and(ord, wun),
+        zero
+    )) {
+        ord = big_integer.shift_down(ord, wun);
+        twos += 1;
+    }
+    a = big_integer.shift_down(a, twos);
+    b = big_integer.shift_down(b, twos);
+
+// At this point, we know that a and b are not both even. If b is even
+// then a must be odd. Swap them, so that the new b is odd.
+
+    if (big_integer.and(b, wun)) {
+        [a, b] = [b, a];
+    }
+
+// Loop until the gcd is found.
+
+    while (true) {
+
+// Remove any remaining trailing zeros from a, making it odd. We can do this
+// because we have already removed all of the common factors of two, so any
+// remaining factors of two are not in the gcd.
+
+    while (big_integer.eq(
+            big_integer.and(a, wun),
+            zero
+        )) {
+            a = big_integer.shift_down(a, wun);
+        }
+
+// The gcd is found when we reach equality.
+
+        if (big_integer.eq(a, b)) {
+            break;
+        }
+
+// Make sure that a is greater than b before replacing a with their difference.
+
+        if (big_integer.abs_lt(a, b)) {
+            [a, b] = [b, a];
+        }
+        a = big_integer.sub(a, b);
+    }
+
+// Incorporate the twos that were extracted earlier.
+
+    return big_integer.shift_up(a, twos);
+}
+
+jsc.claim("gcd", function (verdict, a, b) {
+
+// Compare big_integer.gcd to Stein.
+
+    let euc = big_integer.gcd(a, b);
+    let stn = gcd(a, b);
+    return verdict(big_integer.eq(stn, euc));
+}, [bigint(99), bigint(99)]);
+
+jsc.claim("gcd again", function (verdict, a, b, c) {
+    a = big_integer.mul(a, c);
+    b = big_integer.mul(b, c);
+    let bin = big_integer.gcd(a, b);
+    return verdict(!big_integer.lt(bin, c));
+}, [bigint(99), bigint(99), bigint(99)]);
+
+jsc.claim("gcd one", function (verdict, a) {
+    let b = big_integer.add(a, big_integer.wun);
+    let bin = big_integer.gcd(a, b);
+    return verdict(big_integer.eq(bin, big_integer.wun));
+}, [bigint(100)]);
+
+jsc.claim("mask & population", function (verdict, a, b) {
+    a = big_integer.abs(a);
+    b = big_integer.abs(b);
+    let c = big_integer.shift_up(big_integer.mask(a), b);
+    let aa = big_integer.population(c);
+    return verdict(a === aa);
+}, [bigint(99), bigint(99)]);
+
+jsc.claim("number & make", function (verdict, n) {
+    let a = big_integer.random(n);
+    let x = big_integer.number(a);
+    let aa = big_integer.make(x);
+    if (!(big_integer.eq(a, aa))) {
+        alert("x: " + x + ", a: " + a + ", aa: " + aa);
+    }
+    return verdict(big_integer.eq(a, aa));
+}, jsc.integer(0, 53));
+
+jsc.claim("string & make", function (verdict, n) {
+    let a = big_integer.random(n);
+    let x = big_integer.string(a);
+    let aa = big_integer.make(x);
+    if (!big_integer.eq(a, aa)) {
+        debugger;
+    }
+    return verdict(big_integer.eq(a, aa));
+}, jsc.integer(99));
+
+jsc.check({
+    detail: 3,
+    nr_trials: 100,
+    on_report: function (report) {
+        let output = document.getElementById("output");
+        output.innerHTML = report;
+    }
+});
+
+</script>
+</body></html>

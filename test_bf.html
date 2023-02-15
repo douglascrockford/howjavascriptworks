@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8"/>
+</head>
+<body>
+<pre id=output></pre>
+
+<script type=module>
+
+import big_integer from "./big_integer.js";
+import big_float from "./big_float.js";
+import JSCheck from "./jscheck.js";
+const jsc = JSCheck();
+
+function bigdecimal(max_nr_bits) {
+    return function () {
+        let nr_bits = Math.floor(Math.random() * max_nr_bits);
+        let coefficient = big_integer.random(Math.floor(Math.random() * nr_bits));
+        if (Math.random() < 0.5) {
+            coefficient = big_integer.neg(coefficient);
+        }
+        let exponent = Math.floor(Math.random() * 256) - 128;
+        return big_float.make(coefficient, exponent);
+    };
+}
+
+jsc.claim("add & sub", function (verdict, a, b) {
+    let c = big_float.add(a, b);
+    let aa = big_float.sub(c, b);
+    let cc = big_float.add(aa, b);
+    return verdict(big_float.eq(c, cc));
+}, [bigdecimal(100), bigdecimal(100)]);
+
+jsc.claim("mul", function (verdict, a, b) {
+    let c = big_float.mul(a, b);
+    let cc = big_float.mul(b, a);
+    return verdict(big_float.eq(c, cc));
+}, [bigdecimal(99), bigdecimal(99)]);
+
+jsc.claim("mul & div", function (verdict, a, b) {
+    let c = big_float.mul(a, b);
+    let aa = big_float.div(c, b);
+    if (!big_float.eq(a, aa)) {
+        debugger;
+        let d = big_float.sub(a, aa);
+        let aaa = big_float.div(c, b);
+    }
+    return verdict(big_float.eq(a, aa));
+}, [bigdecimal(99), bigdecimal(99)], function classifier(a, b) {
+    if (big_float.is_zero(b)) {
+        return false;
+    }
+    return String(a.exponent > 0);
+});
+
+jsc.check({
+    detail: 3,
+    nr_trials: 100,
+    on_report: function (report) {
+        let output = document.getElementById("output");
+        output.innerHTML = report;
+    }
+});
+
+debugger;
+console.log(big_float.div({"coefficient":["+"],"exponent":0},{"coefficient":["+"],"exponent":0}));
+
+</script>
+</body></html>

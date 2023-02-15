@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8"/>
+</head>
+<body>
+<pre id=output></pre>
+
+<script type=module>
+
+import big_integer from "./big_integer.js";
+import big_rational from "./big_rational.js";
+import JSCheck from "./jscheck.js";
+const jsc = JSCheck();
+
+function bigrational(max_nr_bits) {
+    return function () {
+        let nr_bits = Math.floor(Math.random() * max_nr_bits);
+        let numerator = big_integer.random(Math.floor(Math.random() * nr_bits));
+        if (Math.random() < 0.5) {
+            numerator = big_integer.neg(numerator);
+        }
+        let denominator = big_integer.random(Math.floor(Math.random() * nr_bits));
+        let result = big_rational.make(numerator, denominator);
+        if (result === undefined) {
+            return big_rational.zero;
+        }
+        return result;
+    };
+}
+
+function bigint(max_nr_bits) {
+    return function () {
+        let nr_bits = Math.floor(Math.random() * max_nr_bits);
+        let result = big_integer.random(nr_bits);
+        return (Math.random() < 0.5)
+            ? big_integer.neg(result)
+            : result;
+    }
+}
+
+
+
+jsc.claim("add & sub", function (verdict, a, b) {
+    let c = big_rational.add(a, b);
+    let aa = big_rational.sub(c, b);
+    let cc = big_rational.add(aa, b);
+    return verdict(big_rational.eq(c, cc));
+}, [bigrational(1000), bigrational(1000)]);
+
+jsc.claim("mul & div", function (verdict, a, b) {
+    let c = big_rational.mul(a, b);
+    let aa = big_rational.div(c, b);
+    return verdict(big_rational.eq(a, aa));
+}, [bigrational(999), bigrational(999)], function classifier(a, b) {
+    if (b === big_rational.zero) {
+        return false;
+    }
+    return "valid";
+});
+
+jsc.claim("eq", function (verdict, a, b, c) {
+    let first = big_rational.make(a, b);
+    let second = big_rational.make(big_integer.mul(a, c), big_integer.mul(b, c));
+    return verdict(big_rational.eq(first, second));
+}, [bigint(99), bigint(99), bigint(99)], function classifier(a, b, c) {
+    if (b === big_integer.zero || c === big_integer.zero) {
+        return false;
+    }
+    return "valid";
+});
+
+jsc.claim("normalize", function (verdict, a, b, c) {
+    let first = big_rational.make(a, b);
+    let second = big_rational.normalize(big_rational.make(big_integer.mul(a, c), big_integer.mul(b, c)));
+    return verdict(big_rational.eq(first, second));
+}, [bigint(99), bigint(99), bigint(99)], function classifier(a, b, c) {
+    if (b === big_integer.zero || c === big_integer.zero) {
+        return false;
+    }
+    return "valid";
+});
+
+jsc.check({
+    detail: 3,
+    nr_trials: 100,
+    on_report: function (report) {
+        let output = document.getElementById("output");
+        output.innerHTML = report;
+    }
+});
+
+</script>
+</body></html>
