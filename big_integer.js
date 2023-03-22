@@ -1,6 +1,6 @@
 // big_integer.js
 // Douglas Crockford
-// 2023-02-12
+// 2023-03-22
 
 // You can access the big integer object in your module by importing it.
 //      import big_integer from "./big_integer.js";
@@ -237,7 +237,6 @@ function make(value, radix_2_37 = 10) {
                 good = true;
                 result = result * radish + BigInt(digit);
             }
-            sign = undefined;
         }
     );
     if (sign === undefined || good === false) {
