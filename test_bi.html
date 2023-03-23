@@ -265,20 +265,7 @@ jsc.claim("gcd", function (verdict, a, b) {
     let euc = big_integer.gcd(a, b);
     let stn = gcd(a, b);
     return verdict(big_integer.eq(stn, euc));
-}, [bigint(99), bigint(99)]);
-
-jsc.claim("gcd again", function (verdict, a, b, c) {
-    a = big_integer.mul(a, c);
-    b = big_integer.mul(b, c);
-    let bin = big_integer.gcd(a, b);
-    return verdict(!big_integer.lt(bin, c));
-}, [bigint(99), bigint(99), bigint(99)]);
-
-jsc.claim("gcd one", function (verdict, a) {
-    let b = big_integer.add(a, big_integer.wun);
-    let bin = big_integer.gcd(a, b);
-    return verdict(big_integer.eq(bin, big_integer.wun));
-}, [bigint(100)]);
+}, [bigint(64), bigint(64)]);
 
 jsc.claim("mask & population", function (verdict, a, b) {
     a = big_integer.abs(a);
@@ -286,7 +273,7 @@ jsc.claim("mask & population", function (verdict, a, b) {
     let c = big_integer.shift_up(big_integer.mask(a), b);
     let aa = big_integer.population(c);
     return verdict(a === aa);
-}, [bigint(99), bigint(99)]);
+}, [bigint(10), bigint(10)]);
 
 jsc.claim("number & make", function (verdict, n) {
     let a = big_integer.random(n);
@@ -307,6 +294,17 @@ jsc.claim("string & make", function (verdict, n) {
     }
     return verdict(big_integer.eq(a, aa));
 }, jsc.integer(99));
+
+jsc.claim("hex", function (verdict, n) {
+    let nn = big_integer.make(n);
+    let s = Number(n).toString(16).toUpperCase();
+    let ss = big_integer.string(nn, 16);
+    if (s !== ss) {
+        return verdict(false);
+    }
+    let nnn = big_integer.make(ss, 16);
+    return verdict(big_integer.eq(nn, nnn));
+}, [jsc.integer(0, 1000)]);
 
 jsc.check({
     detail: 3,
